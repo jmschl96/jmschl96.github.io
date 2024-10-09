@@ -49,6 +49,7 @@ main {
     margin: 10px 0;
     padding: 15px;
     width: 300px;
+    font-size: 18px;
     text-align: center;
     transition: box-shadow 0.3s;
 }
