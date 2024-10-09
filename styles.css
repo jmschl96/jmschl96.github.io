@@ -18,8 +18,16 @@ body {
 header {
     background-color: #0077cc;
     color: white;
-    padding: 20px 0;
+    padding: 15px 0;
     text-align: center;
+}
+
+#logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #333;
+    margin: 15px 0;
 }
 
 nav a {
@@ -36,6 +44,21 @@ main {
     margin: 0 auto;
 }
 
+#me {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto;
+}
+
+p {
+    font-size: 22px;
+}
+
+main h1 {
+    text-align: center;
+}
 .game-list {
     display: flex;
     flex-direction: column;
@@ -44,12 +67,12 @@ main {
 
 .game-item {
     background-color: white;
-    border: 1px solid #ccc;
+    border: 2px solid #333;
     border-radius: 5px;
     margin: 10px 0;
     padding: 15px;
     width: 300px;
-    font-size: 18px;
+    font-size: 22px;
     text-align: center;
     transition: box-shadow 0.3s;
 }
@@ -63,10 +86,12 @@ footer {
     padding: 15px;
     background-color: #0077cc;
     color: white;
+    font-size: 18px;
 }
 
 #footer-link {
     color: white;
+    font-size: 18px;
 }
 
 @media (max-width: 600px) {
