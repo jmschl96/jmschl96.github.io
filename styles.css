@@ -68,13 +68,13 @@ p {
 main h1 {
     text-align: center;
 }
-.game-list {
+.project-list {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.game-item {
+.project-item {
     background-color: white;
     border: 2px solid #333;
     border-radius: 5px;
@@ -86,7 +86,7 @@ main h1 {
     transition: box-shadow 0.3s;
 }
 
-.game-item:hover {
+.project-item:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
