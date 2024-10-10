@@ -18,19 +18,24 @@
         canvas {
             background-color: #000;
             margin: 20px 0;
+            position: relative;
         }
-
-        .start-message, .game-over {
+        .score {
+            font-size: 24px;
+            color: #333;
+            margin: 10px;
+        }
+        .game-over {
+            position: absolute; /* Changed to absolute */
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -50%); /* Adjust position to center */
             font-size: 36px;
             color: #f0f0f0;
+            margin-top: 20px;
             display: none;
-            position: absolute;
-            top: 35%; /* adjust this value to center vertically */
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            margin: 0;
         }
+
         .joystick {
             position: fixed;
             bottom: 20px;
@@ -57,26 +62,26 @@
             left: 10px;
             font-size: 18px;
             text-decoration: none;
-            color: rgba(255, 255, 255, 0.8);
+            color: #f0f0f0;
             background: #333;
             padding: 10px 20px;
             border-radius: 5px;
         }
-
-        .game-over #restartButton {
-            background-color: #333;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
+        /* Button styles */
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
             font-size: 24px;
+            color: #333;
+            background-color: #f0f0f0;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
-            margin-top: 20px;
+            display: none; /* Initially hidden */
         }
-
-        .game-over #restartButton:hover {
-            background-color: #444;
-        }
-
         /* Hide joystick on larger screens */
         @media (min-width: 601px) {
             .joystick {
@@ -88,21 +93,21 @@
 <body>
     <a href="/" class="home-link">Home</a> <!-- Link back to home -->
     <h1>Snake</h1>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div class="start-message" id="startMessage">Move to Play</div>
-    <div class="game-over" id="gameOver">
-        Final Score: <span id="finalScore"></span>
-        <button id="restartButton">Restart</button>
+    <div class="score" id="score">Score: 0</div>
+    <div style="position: relative;">
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+        <div class="game-over" id="gameOver">Game Over!</div>
     </div>
+    <button class="play-button" id="playButton">Play</button>
     <div class="joystick" id="joystick">
         <div class="joystick-inner" id="joystickInner"></div>
     </div>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const startMessage = document.getElementById('startMessage');
+        const scoreDisplay = document.getElementById('score');
         const gameOverDisplay = document.getElementById('gameOver');
-        const finalScoreDisplay = document.getElementById('finalScore');
+        const playButton = document.getElementById('playButton');
         const box = 20;
         let snake, direction, food, score, game, gameStarted;
 
@@ -111,8 +116,9 @@
             direction = null;
             score = 0;
             gameStarted = false;
+            scoreDisplay.textContent = `Score: ${score}`;
             gameOverDisplay.style.display = 'none';
-            startMessage.style.display = 'block';
+            playButton.style.display = 'block'; // Show play button
             clearCanvas();
         }
 
@@ -121,30 +127,29 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
-        function drawScore() {
-            ctx.fillStyle = '#fff';
-            ctx.font = '24px Arial';
-            ctx.fillText(`Score: ${score}`, 10, 30); // Draw score in top left corner
-        }
-
         function startGame() {
             food = {
                 x: Math.floor(Math.random() * 20) * box,
                 y: Math.floor(Math.random() * 20) * box
             };
-            startMessage.style.display = 'none';
+            playButton.style.display = 'none'; // Hide play button
             game = setInterval(draw, 100);
         }
 
-        document.addEventListener('keydown', (e) => {
+        playButton.addEventListener('click', () => {
             if (!gameStarted) {
                 gameStarted = true;
                 startGame();
             }
-            if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
-            if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
-            if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
-            if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (gameStarted) {
+                if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+                if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+                if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+                if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
+            }
         });
 
         const joystick = document.getElementById('joystick');
@@ -211,8 +216,6 @@
             ctx.fillStyle = 'lime';
             snake.forEach(part => ctx.fillRect(part.x, part.y, box, box));
 
-            drawScore(); // Draw the score
-
             let head = { x: snake[0].x, y: snake[0].y };
             if (direction === 'UP') head.y -= box;
             if (direction === 'DOWN') head.y += box;
@@ -222,13 +225,13 @@
             if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || snake.some((part, i) => i !== 0 && part.x === head.x && part.y === head.y)) {
                 clearInterval(game);
                 gameOverDisplay.style.display = 'block';
-                finalScoreDisplay.textContent = score;
                 return;
             }
 
             snake.unshift(head);
             if (head.x === food.x && head.y === food.y) {
                 score++;
+                scoreDisplay.textContent = `Score: ${score}`;
                 food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
             } else {
                 snake.pop();
@@ -238,18 +241,12 @@
             ctx.fillRect(food.x, food.y, box, box);
         }
 
-        const restartButton = document.getElementById('restartButton');
-
-        restartButton.addEventListener('click', () => {
-            initializeGame();
-        });
-
         canvas.addEventListener('click', () => {
             if (!gameStarted) return;
             initializeGame();
         });
 
         initializeGame();
-    </script>
+    </script>  
 </body>
 </html>
