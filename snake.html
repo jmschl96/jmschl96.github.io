@@ -3,42 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
     <title>Snake</title>
     <link rel="icon" type="image/x-icon" href="favicon.png">
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
         canvas {
             background-color: #000;
-            margin: 20px 0;
-            position: relative;
+            display: block;
+            margin: 0 auto;
         }
-        .score {
-            font-size: 24px;
-            color: #333;
-            margin: 10px;
-        }
-        .game-over {
-            position: absolute; /* Changed to absolute */
-            top: 50%; /* Center vertically */
-            left: 50%; /* Center horizontally */
-            transform: translate(-50%, -50%); /* Adjust position to center */
-            font-size: 36px;
-            color: #f0f0f0;
-            margin-top: 20px;
-            display: none;
-        }
-
         .joystick {
+            display: none; /* Hide by default */
             position: fixed;
-            bottom: 20px;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
             width: 100px;
@@ -56,165 +33,92 @@
             border-radius: 50%;
             transform: translate(-50%, -50%);
         }
-        .home-link {
-            position: absolute;
-            top: 20px;
-            left: 10px;
-            font-size: 18px;
-            text-decoration: none;
-            color: #f0f0f0;
-            background: #333;
-            padding: 10px 20px;
-            border-radius: 5px;
-        }
-        /* Button styles */
-        .play-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 15px 30px;
-            font-size: 24px;
-            color: #333;
-            background-color: #f0f0f0;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            display: none; /* Initially hidden */
-        }
-        /* Hide joystick on larger screens */
-        @media (min-width: 601px) {
+        @media (max-width: 768px) {
             .joystick {
-                display: none;
+                display: block; /* Show only on screens smaller than 768px */
             }
         }
     </style>
 </head>
 <body>
-    <a href="/" class="home-link">Home</a> <!-- Link back to home -->
-    <h1>Snake</h1>
-    <div class="score" id="score">Score: 0</div>
-    <div style="position: relative;">
+    <header>
+        <img id="logo" src="logo.png" alt="Logo">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+    <main>
+        <h1>Snake</h1>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <div class="game-over" id="gameOver">Game Over!</div>
-    </div>
-    <button class="play-button" id="playButton">Play</button>
-    <div class="joystick" id="joystick">
-        <div class="joystick-inner" id="joystickInner"></div>
-    </div>
+        <div class="joystick" id="joystick">
+            <div class="joystick-inner" id="joystickInner"></div>
+        </div>
+    </main>
+    <footer>
+        <p>Made with ❤️ by <a class="footer-link" href="https://github.com/jmschl96">@jmschl96</a> and <a class="footer-link" href="https://chatgpt.com">ChatGPT</a></p>    </footer>
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const scoreDisplay = document.getElementById('score');
-        const gameOverDisplay = document.getElementById('gameOver');
-        const playButton = document.getElementById('playButton');
         const box = 20;
-        let snake, direction, food, score, game, gameStarted;
+        let snake = [{ x: 9 * box, y: 9 * box }];
+        let direction = null;
+        let food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
 
-        function initializeGame() {
-            snake = [{ x: 9 * box, y: 9 * box }];
-            direction = null;
-            score = 0;
-            gameStarted = false;
-            scoreDisplay.textContent = `Score: ${score}`;
-            gameOverDisplay.style.display = 'none';
-            playButton.style.display = 'block'; // Show play button
-            clearCanvas();
-        }
-
-        function clearCanvas() {
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
-
-        function startGame() {
-            food = {
-                x: Math.floor(Math.random() * 20) * box,
-                y: Math.floor(Math.random() * 20) * box
-            };
-            playButton.style.display = 'none'; // Hide play button
-            game = setInterval(draw, 100);
-        }
-
-        playButton.addEventListener('click', () => {
-            if (!gameStarted) {
-                gameStarted = true;
-                startGame();
-            }
-        });
-
+        // Keyboard control
         document.addEventListener('keydown', (e) => {
-            if (gameStarted) {
-                if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
-                if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
-                if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
-                if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
-            }
+            if (e.key === 'ArrowUp' && direction !== 'DOWN') direction = 'UP';
+            if (e.key === 'ArrowDown' && direction !== 'UP') direction = 'DOWN';
+            if (e.key === 'ArrowLeft' && direction !== 'RIGHT') direction = 'LEFT';
+            if (e.key === 'ArrowRight' && direction !== 'LEFT') direction = 'RIGHT';
         });
 
+        // Joystick control
         const joystick = document.getElementById('joystick');
         const joystickInner = document.getElementById('joystickInner');
         let isDragging = false;
-        let joystickCenterX, joystickCenterY;
-        const maxMoveDistance = 50; // Maximum distance for joystick movement in pixels
+        let joystickStartX, joystickStartY;
 
-        function startDrag(e) {
+        joystick.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (!gameStarted) {
-                gameStarted = true;
-                startGame();
-            }
             isDragging = true;
-            const rect = joystick.getBoundingClientRect();
-            joystickCenterX = rect.left + rect.width / 2;
-            joystickCenterY = rect.top + rect.height / 2;
-        }
+            const touch = e.touches[0];
+            joystickStartX = touch.pageX;
+            joystickStartY = touch.pageY;
+        });
 
-        function drag(e) {
+        joystick.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
             e.preventDefault();
-            const pageX = e.pageX || e.touches[0].pageX;
-            const pageY = e.pageY || e.touches[0].pageY;
-            let deltaX = pageX - joystickCenterX;
-            let deltaY = pageY - joystickCenterY;
+            const touch = e.touches[0];
+            const deltaX = touch.pageX - joystickStartX;
+            const deltaY = touch.pageY - joystickStartY;
 
-            // Limit movement to within maxMoveDistance
-            const distance = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-            if (distance > maxMoveDistance) {
-                const angle = Math.atan2(deltaY, deltaX);
-                deltaX = Math.cos(angle) * maxMoveDistance;
-                deltaY = Math.sin(angle) * maxMoveDistance;
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 10 && direction !== 'LEFT') direction = 'RIGHT';
+                else if (deltaX < -10 && direction !== 'RIGHT') direction = 'LEFT';
+            } else {
+                if (deltaY > 10 && direction !== 'UP') direction = 'DOWN';
+                else if (deltaY < -10 && direction !== 'DOWN') direction = 'UP';
             }
 
             joystickInner.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        });
 
-            // Determine direction based on quadrant
-            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                if (deltaX > 0 && direction !== 'LEFT') direction = 'RIGHT';
-                else if (deltaX < 0 && direction !== 'RIGHT') direction = 'LEFT';
-            } else {
-                if (deltaY > 0 && direction !== 'UP') direction = 'DOWN';
-                else if (deltaY < 0 && direction !== 'DOWN') direction = 'UP';
-            }
-        }
-
-        function stopDrag() {
+        joystick.addEventListener('touchend', () => {
             isDragging = false;
             joystickInner.style.transform = 'translate(-50%, -50%)';
-        }
-
-        joystick.addEventListener('mousedown', startDrag);
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('mouseup', stopDrag);
-        joystick.addEventListener('touchstart', startDrag);
-        document.addEventListener('touchmove', drag);
-        document.addEventListener('touchend', stopDrag);
+        });
 
         function draw() {
-            clearCanvas();
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.fillStyle = 'lime';
-            snake.forEach(part => ctx.fillRect(part.x, part.y, box, box));
+            snake.forEach(part => {
+                ctx.fillRect(part.x, part.y, box, box);
+            });
 
             let head = { x: snake[0].x, y: snake[0].y };
             if (direction === 'UP') head.y -= box;
@@ -222,17 +126,15 @@
             if (direction === 'LEFT') head.x -= box;
             if (direction === 'RIGHT') head.x += box;
 
-            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height || snake.some((part, i) => i !== 0 && part.x === head.x && part.y === head.y)) {
-                clearInterval(game);
-                gameOverDisplay.style.display = 'block';
-                return;
-            }
+            if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) return clearInterval(game);
+            if (snake.some((part, index) => index !== 0 && part.x === head.x && part.y === head.y)) return clearInterval(game);
 
             snake.unshift(head);
             if (head.x === food.x && head.y === food.y) {
-                score++;
-                scoreDisplay.textContent = `Score: ${score}`;
-                food = { x: Math.floor(Math.random() * 20) * box, y: Math.floor(Math.random() * 20) * box };
+                food = {
+                    x: Math.floor(Math.random() * 20) * box,
+                    y: Math.floor(Math.random() * 20) * box,
+                };
             } else {
                 snake.pop();
             }
@@ -241,12 +143,13 @@
             ctx.fillRect(food.x, food.y, box, box);
         }
 
-        canvas.addEventListener('click', () => {
-            if (!gameStarted) return;
-            initializeGame();
-        });
+        const game = setInterval(draw, 100);
 
-        initializeGame();
-    </script>  
+        // Show joystick only on mobile devices
+        window.addEventListener('load', () => {
+            const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+            joystick.style.display = isMobile ? 'block' : 'none';
+        });
+    </script>
 </body>
 </html>
