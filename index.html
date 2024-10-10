@@ -8,33 +8,41 @@
     <link rel="icon" type="image/x-icon" href="favicon.png">
 </head>
 <body>
-    <header>
-        <div class="lazy-coder-badge">Lazy coder, AI ninja</div>
-        <img id="logo" src="logo.png" alt="Logo">
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="about.html">About</a>
-            <a href="contact.html">Contact</a>
-        </nav>
-    </header>
-    <main>
-        <h1>Portfolio</h1>
-        <section class="project-list">
-            <div class="project-item">
-                <a href="https://jmschl96.com/password-generator/" target="_blank">Password Generator</a>
-            </div>
-            <div class="project-item">
-                <a href="https://jmschl96.com/calculator/" target="_blank">Calculator</a>
-            </div>
-            <div class="project-item">
-                <a href="https://jmschl96.com/fruit-clicker/" target="_blank">Fruit Clicker</a>
-            </div>
-            
-            <!-- Add more projects here -->
-        </section>
-    </main>
-    <footer>
-        <p>Made with ❤️ by <a class="footer-link" href="https://github.com/jmschl96">@jmschl96</a></p>
-    </footer>
+    <div class="container"> <!-- Added container -->
+        <header>
+            <img id="logo" src="logo.jpg" alt="Logo">
+        </header>
+        <main>
+            <h1>Welcome to My Portfolio</h1>
+            <section class="about">
+                <p>I’m a tech enthusiast with a passion for exploring various technologies and discovering innovative solutions. Currently, I’m working on NoteVault, a simple and secure note-taking application.</p>
+            </section>
+            <section class="project-list">
+                <h2>Project</h2>
+                <div class="project-item">
+                    <a href="https://github.com/jmschl96/NotesKeeper" target="_blank"> <!-- Wrap the entire div in the anchor tag -->
+                        <h3>NoteVault</h3>
+                        <p>A simple and secure note-taking application that allows users to create, organize, and manage their notes effectively.</p>
+                    </a>
+                </div>
+                <!-- Add more projects here -->
+            </section>
+            <section class="skills">
+                <h2>Skills</h2>
+                <ul>
+                    <li>Hardware</li>
+                    <li>Networking</li>
+                    <li>Programming</li>
+                    <li>Databases</li>
+                    <li>Web Development</li>
+                    <li>Multimedia</li>
+                    <li>Cybersecurity</li>
+                </ul>
+            </section>
+        </main>
+        <footer>
+            <p>Made with ❤️ by <a class="footer-link" href="https://github.com/jmschl96">@jmschl96</a></p>
+        </footer>
+    </div> <!-- Closing container -->
 </body>
 </html>
