@@ -45,11 +45,16 @@ main {
 }
 
 #me {
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
+    width: 200px;
+    height: 200px;
     display: block;
-    margin: 0 auto;
+    margin-right: 20px;
+}
+
+#about-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 p {
@@ -105,5 +110,11 @@ footer {
 
     nav a {
         margin: 0 10px; /* Adjust margin on mobile */
+    }
+}
+
+@media (max-width: 800px) {
+    #about-container {
+        flex-direction: column;
     }
 }
