@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Snake</title>
+    <style>
+        #myCanvas {
+            background-color: lightgrey;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img id="logo" src="logo.png" alt="Logo">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+    <main>
+        <h1>Snake</h1>
+        <canvas id="myCanvas"></canvas>
+    </main>
+    <footer>
+        <p>Made with ❤️ by <a id="footer-link" href="https://github.com/jmschl96">@jmschl96</a></p>
+    </footer>
+    <script>
+        // GAME LOGIC VARIABLES
+
+        const Direction = {
+            UP: 1,
+            RIGHT: 2,
+            DOWN: 3,
+            LEFT: 4
+        };
+
+        var tileSize = 15;
+        var nrOfTilesInX = 30;
+        var nrOfTilesInY = 30;
+
+        var snakeColor = "green";
+        var snake = [{ x: 2, y: 2 }]; // Initialize the snake as an array of one segment
+        var snakeDirection = Direction.RIGHT;
+
+        var foodColor = "red";
+        var foodX = getRandomNumber(0, nrOfTilesInX - 1);
+        var foodY = getRandomNumber(0, nrOfTilesInY - 1);
+
+        var score = 0;
+
+        // CANVAS VARIABLES
+
+        var canvas = document.getElementById("myCanvas");
+        var ctx = canvas.getContext("2d");
+
+        ctx.canvas.width = nrOfTilesInX * tileSize;
+        ctx.canvas.height = nrOfTilesInY * tileSize;
+
+        // GAME LOOP
+
+        function gameLoop() {
+            clearCanvas();
+
+            moveSnake();
+
+            checkFoodCollision();
+            checkWallCollision();
+            checkSelfCollision(); // Check for self-collision
+
+            // Draw the snake
+            for (let segment of snake) {
+                fillTile(segment.x, segment.y, snakeColor);
+            }
+            
+            // Draw the food
+            fillTile(foodX, foodY, foodColor);
+
+            drawText("Score: " + score, "20px Arial", "black", 10, 30);
+        }
+
+        var gameLoopInterval = setInterval(gameLoop, 100);
+
+        // GAME LOGIC FUNCTIONS
+
+        function moveSnake() {
+            // Create a new head based on the current direction
+            let head = { ...snake[0] };
+            if (snakeDirection === Direction.UP) {
+                head.y -= 1;
+            } else if (snakeDirection === Direction.RIGHT) {
+                head.x += 1;
+            } else if (snakeDirection === Direction.DOWN) {
+                head.y += 1;
+            } else if (snakeDirection === Direction.LEFT) {
+                head.x -= 1;
+            }
+            
+            // Add the new head to the front of the snake array
+            snake.unshift(head);
+
+            // Remove the last segment if we didn't eat food
+            if (!(head.x === foodX && head.y === foodY)) {
+                snake.pop();
+            }
+        }
+
+        function checkFoodCollision() {
+            let head = snake[0];
+            if (head.x === foodX && head.y === foodY) {
+                score += 1;
+                generateNewFood();
+            }
+        }
+
+        function generateNewFood() {
+            foodX = getRandomNumber(0, nrOfTilesInX - 1);
+            foodY = getRandomNumber(0, nrOfTilesInY - 1);
+        }
+
+        function gameOver() {
+            const text = "Game over!";
+            const fontSize = "60px Arial";
+            
+            // Set the font to calculate width
+            ctx.font = fontSize;
+            const textWidth = ctx.measureText(text).width;
+            
+            drawText(
+                text,
+                fontSize,
+                "black",
+                (canvas.width - textWidth) / 2, // Center the text horizontally
+                canvas.height / 2 // Center the text vertically
+            );
+            clearInterval(gameLoopInterval);
+        }
+
+        function checkWallCollision() {
+            let head = snake[0];
+            if (head.x < 0 || head.x >= nrOfTilesInX || head.y < 0 || head.y >= nrOfTilesInY) {
+                gameOver();
+            }
+        }
+
+        function checkSelfCollision() {
+            let head = snake[0];
+            // Check if the head collides with any other segment of the snake
+            for (let i = 1; i < snake.length; i++) {
+                if (head.x === snake[i].x && head.y === snake[i].y) {
+                    gameOver();
+                    break;
+                }
+            }
+        }
+
+        // DRAWING FUNCTIONS
+
+        function fillTile(x, y, color) {
+            ctx.beginPath();
+            ctx.rect(x * tileSize, y * tileSize, tileSize, tileSize);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawText(text, font, color, x, y) {
+            ctx.beginPath();
+            ctx.font = font;
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+            ctx.closePath();
+        }
+
+        // USER INTERACTION FUNCTIONS
+
+        function keyPressed(event) {
+            if (event.key === "ArrowUp" && snakeDirection !== Direction.DOWN) {
+                snakeDirection = Direction.UP;
+            } else if (event.key === "ArrowRight" && snakeDirection !== Direction.LEFT) {
+                snakeDirection = Direction.RIGHT;
+            } else if (event.key === "ArrowDown" && snakeDirection !== Direction.UP) {
+                snakeDirection = Direction.DOWN;
+            } else if (event.key === "ArrowLeft" && snakeDirection !== Direction.RIGHT) {
+                snakeDirection = Direction.LEFT;
+            }
+        }
+
+        document.addEventListener("keydown", keyPressed);
+
+        // HELPER FUNCTIONS
+
+        function getRandomNumber(start, end) {
+            return Math.floor(Math.random() * (end - start + 1)) + start;
+        }
+
+    </script>
+</body>
+</html>
